@@ -669,8 +669,37 @@ input:focus { border-color: var(--green1); }
 
 /* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .groups-sidebar { display: none; }
-  .page-layout    { gap: 0; padding-top: 20px; }
+  .page-layout {
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 16px;
+  }
+  .groups-sidebar {
+    width: 100%;
+    position: static;
+    max-height: none;
+    border-radius: 12px;
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+  /* Show groups horizontally on mobile */
+  #groups-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+  .sb-group {
+    min-width: 160px;
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+    padding: 4px 0 8px;
+    flex-shrink: 0;
+  }
+  .sb-group:last-child { border-right: none; }
 }
 @media (max-width: 600px) {
   .match-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
@@ -978,4 +1007,16 @@ input:focus { border-color: var(--green1); }
   .ranking-sidebar { width: 100%; position: static; }
   .ranking-pokal-card { padding: 16px; }
   .ranking-pokal-icon { font-size: 32px; }
+}
+
+/* ── DEADLINE MESSAGE ─────────────────────────────────────────────────────── */
+.deadline-msg {
+  background: #fff8f0;
+  border: 1.5px solid #f5cba7;
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  font-size: 15px;
+  color: var(--orange);
+  font-weight: 500;
+  margin-top: 8px;
 }
