@@ -400,8 +400,20 @@ function clearDownstream(bracket, changedKey, changedIdx) {
     });
   }
   if (changedKey === "sf") {
+    // Final pool = SF winners
     const fPool = [...bracket.sf].filter(Boolean);
     if (bracket.f && !fPool.includes(bracket.f)) bracket.f = "";
+    // Bronze pool = SF losers — recalculate and clear if invalid
+    const bronzePool = [];
+    SF.forEach((m, i) => {
+      const sfWinner = bracket.sf[i];
+      const c0 = bracket.qf[m.from[0]];
+      const c1 = bracket.qf[m.from[1]];
+      if (sfWinner && c0 && c0 !== sfWinner) bronzePool.push(c0);
+      if (sfWinner && c1 && c1 !== sfWinner) bronzePool.push(c1);
+      if (!sfWinner) { if (c0) bronzePool.push(c0); if (c1) bronzePool.push(c1); }
+    });
+    if (bracket.bronze && !bronzePool.includes(bracket.bronze)) bracket.bronze = "";
   }
 }
 
