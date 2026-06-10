@@ -1,3 +1,15 @@
+// ── DEADLINE ─────────────────────────────────────────────────────────────────
+// Tipping stenger 11. juni 2026 kl. 21:00 norsk tid (UTC+2)
+const DEADLINE = new Date("2026-06-11T19:00:00Z"); // 21:00 Oslo = 19:00 UTC
+
+function isTippingOpen() {
+  return new Date() < DEADLINE;
+}
+
+function deadlineText() {
+  return "Tipping er stengt — fristen var 11. juni kl. 21:00.";
+}
+
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let state = {
   name: "",
@@ -40,6 +52,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (e) {
     showToast("⚠️ Kunne ikke koble til backend — sjekk API_URL i js/api.js");
   }
+  // Render ranking immediately so it's visible without login
+  renderRanking();
 });
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
@@ -52,7 +66,13 @@ function setupTabs() {
       document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
       // Sidebar only visible in tip tab when logged in
       updateSidebarVisibility();
-      if (btn.dataset.tab === "ranking") renderRanking();
+      if (btn.dataset.tab === "ranking") {
+        // Refresh entries from backend before rendering
+        api.getEntries().then(res => {
+          if (res.ok) state.entries = res.entries || {};
+          renderRanking();
+        }).catch(() => renderRanking());
+      }
     });
   });
 }
@@ -90,6 +110,20 @@ function submitName() {
   const n = document.getElementById("name-input").value.trim();
   if (!n) return;
   state.name = n;
+  // Check deadline
+  if (!isTippingOpen()) {
+    document.getElementById("name-gate").classList.add("hidden");
+    document.getElementById("bracket-area").classList.remove("hidden");
+    document.getElementById("bracket-title").textContent = "Tipping er stengt 🔒";
+    document.getElementById("user-name-display").textContent = n;
+    document.getElementById("user-pill").classList.remove("hidden");
+    document.getElementById("bracket-sections").innerHTML =
+      `<div class="deadline-msg">${deadlineText()}</div>`;
+    document.getElementById("round-pills").style.display = "none";
+    document.getElementById("btn-save").style.display = "none";
+    updateSidebarVisibility();
+    return;
+  }
   if (state.entries[n]) {
     const saved = JSON.parse(JSON.stringify(state.entries[n]));
     const empty = emptyBracket();
@@ -113,6 +147,7 @@ function submitName() {
 
 async function saveBracket() {
   if (!state.name) return;
+  if (!isTippingOpen()) { showToast("⏰ " + deadlineText()); return; }
   const btn = document.getElementById("btn-save");
   btn.textContent = "Lagrer..."; btn.disabled = true;
   try {
