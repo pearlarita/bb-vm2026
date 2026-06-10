@@ -455,10 +455,20 @@ function renderBracketTo(containerId, bracket, readOnly, activeRound, onChange, 
     ));
   }
   if (show("bronze")) {
+    // Bronze pool = SF losers (QF winners that were NOT chosen as SF winners)
+    const bronzePool = [];
+    SF.forEach((m, i) => {
+      const sfWinner = bracket.sf[i];
+      const c0 = bracket.qf[m.from[0]];
+      const c1 = bracket.qf[m.from[1]];
+      if (sfWinner && c0 && c0 !== sfWinner) bronzePool.push(c0);
+      if (sfWinner && c1 && c1 !== sfWinner) bronzePool.push(c1);
+      if (!sfWinner) { if (c0) bronzePool.push(c0); if (c1) bronzePool.push(c1); }
+    });
     container.appendChild(makeSingleMatchSection("Bronsefinale","18. jul",20,false,
       BRONZE_MATCH, bracket.bronze, readOnly,
       v => onChange("bronze",0,v),
-      [...bracket.sf].filter(Boolean)
+      [...new Set(bronzePool)]
     ));
   }
   if (show("f")) {
