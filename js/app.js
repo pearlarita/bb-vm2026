@@ -127,12 +127,16 @@ function submitName() {
   if (state.entries[n]) {
     const saved = JSON.parse(JSON.stringify(state.entries[n]));
     const empty = emptyBracket();
-    // Merge saved into empty so all keys always exist
-    state.bracket = Object.assign(empty, saved);
-    // Ensure groups has all 12 groups
-    Object.keys(GROUPS).forEach(g => {
-      if (!state.bracket.groups[g]) state.bracket.groups[g] = [null,null,null,null];
-    });
+    // Deep merge: copy all top-level keys from saved
+    state.bracket = {
+      ...empty,
+      ...saved,
+      // Deep merge groups: keep saved group rankings, fill missing groups with empty
+      groups: Object.keys(GROUPS).reduce((acc, g) => {
+        acc[g] = (saved.groups && saved.groups[g]) ? saved.groups[g] : [null,null,null,null];
+        return acc;
+      }, {}),
+    };
   }
 
   document.getElementById("name-gate").classList.add("hidden");
@@ -147,7 +151,7 @@ function submitName() {
 
 async function saveBracket() {
   if (!state.name) return;
-  if (!isTippingOpen()) { showToast("⏰ " + deadlineText()); return; }
+  if (!isTippingOpen() && !state.adminMode) { showToast("⏰ " + deadlineText()); return; }
   const btn = document.getElementById("btn-save");
   btn.textContent = "Lagrer..."; btn.disabled = true;
   try {
@@ -322,7 +326,7 @@ function clearGroupDownstream(groupLetter) {
     const involvedGroups = [];
     if (m.gA) involvedGroups.push(m.gA.g);
     if (m.gB) involvedGroups.push(m.gB.g);
-    else involvedGroups.push(...Object.keys(GROUPS)); // best3: all groups involved
+    else if (m.best3Groups) involvedGroups.push(...m.best3Groups); // only the specific best3 groups
     if (involvedGroups.includes(groupLetter)) {
       const pool = getR32Pool(i, state.bracket);
       if (state.bracket.r32[i] && !pool.includes(state.bracket.r32[i])) {
