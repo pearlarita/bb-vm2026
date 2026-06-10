@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VM-Tipping 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo">
+        <div class="logo-title">⚽ BBs VM-Tipping 2026! 🎉</div>
+        <div class="logo-sub">USA · Canada · Mexico · 11. jun – 19. jul</div>
+      </div>
+      <div id="user-pill" class="user-pill hidden">
+        👤 <strong id="user-name-display"></strong>
+        <button id="btn-switch-user">bytt</button>
+      </div>
+    </div>
+    <div class="container">
+      <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="tip">✏️ Tipp</button>
+        <button class="tab-btn" data-tab="schedule">📅 Kampprogram</button>
+        <button class="tab-btn" data-tab="ranking">🏆 Rangering</button>
+        <button class="tab-btn" data-tab="info">ℹ️ Poeng</button>
+        <button class="tab-btn tab-admin" data-tab="admin">⚙️</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- PAGE LAYOUT: sidebar + main -->
+  <div class="page-layout container">
+
+    <!-- STICKY SIDEBAR: gruppeoversikt -->
+    <aside class="groups-sidebar" id="groups-sidebar" style="display:none">
+      <div class="sidebar-title">Grupper</div>
+      <div id="groups-list"></div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- TIP TAB -->
+      <div id="tab-tip" class="tab-pane active">
+        <div id="name-gate" class="name-gate">
+          <div class="name-card">
+            <div class="name-emoji">⚽</div>
+            <h2>Velkommen!</h2>
+            <p>Skriv inn navnet ditt for å lagre dine vinner-lag</p>
+            <input id="name-input" type="text" placeholder="Ditt navn" autocomplete="off"/>
+            <button id="btn-start" class="btn-primary">Start tipping →</button>
+          </div>
+        </div>
+        <div id="bracket-area" class="hidden">
+          <div class="bracket-header">
+            <div>
+              <h2 id="bracket-title">Din vinneroppstilling</h2>
+              <p class="sub">Kamper kan filtreres under, og kun aktuelle lag vises i nedtrekkslisten. Start med å rangere gruppekampene til venstre. Husk å lagre til slutt ❤️</p>
+            </div>
+          </div>
+          <div id="round-pills" class="round-pills"></div>
+          <div id="bracket-sections"></div>
+          <button id="btn-save" class="btn-primary btn-save-bottom">💾 Lagre</button>
+        </div>
+      </div>
+
+      <!-- SCHEDULE TAB -->
+      <div id="tab-schedule" class="tab-pane hidden">
+        <h2>Kampprogram 📅</h2>
+        <p class="sub">Alle tider er norsk tid</p>
+        <div id="sched-pills" class="round-pills" style="margin-top:16px"></div>
+        <div id="sched-content" style="margin-top:20px"></div>
+      </div>
+
+      <!-- RANKING TAB -->
+      <div id="tab-ranking" class="tab-pane hidden">
+        <div class="ranking-layout">
+          <div class="ranking-main">
+            <h2>Rangering 🏆</h2>
+            <p class="sub" id="ranking-sub">Laster...</p>
+            <div id="ranking-list" style="margin-top:20px"></div>
+          </div>
+          <div class="ranking-sidebar">
+            <div class="ranking-pokal-card">
+              <div class="ranking-pokal-icon">🏆</div>
+              <div class="ranking-pokal-text">Hvem stikker av med pokalen? 👀</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INFO TAB -->
+      <div id="tab-info" class="tab-pane hidden">
+        <h2>Poenggivning</h2>
+        <div class="info-table">
+          <div class="info-row"><span>Gruppeplassering (per lag)</span><span class="pts-badge">+2 pts</span></div>
+          <div class="info-row"><span>16-delsfinale</span><span class="pts-badge">+3 pts</span></div>
+          <div class="info-row"><span>8-delsfinale</span><span class="pts-badge">+5 pts</span></div>
+          <div class="info-row"><span>Kvartfinale</span><span class="pts-badge">+10 pts</span></div>
+          <div class="info-row"><span>Semifinale</span><span class="pts-badge">+15 pts</span></div>
+          <div class="info-row"><span>Bronsefinale</span><span class="pts-badge">+20 pts</span></div>
+          <div class="info-row"><span>Finale (vinner)</span><span class="pts-badge">+35 pts</span></div>
+          <div class="info-row info-total"><span>Maks mulig</span><strong class="pts-badge gold">309 pts</strong></div>
+        </div>
+        <div class="info-trophy">Den med flest poeng vil få tildelt en helt egen pokal — heia! 🏆</div>
+        <div class="info-tv">
+          <strong>TV-sendinger:</strong><br/>
+          <span class="badge-tv2">TV 2</span> 16-delsfinaler, kvartfinaler, semifinaler<br/>
+          <span class="badge-nrk">NRK</span> 8-delsfinaler, bronsefinale, finalen
+        </div>
+      </div>
+
+      <!-- ADMIN TAB -->
+      <div id="tab-admin" class="tab-pane hidden">
+        <h2 style="color:var(--orange)">⚙️ Admin — Legg inn fasit</h2>
+        <div id="admin-gate">
+          <div class="name-card" style="text-align:left">
+            <p style="color:var(--text-soft);margin-bottom:12px">Passord kreves for å legge inn fasit</p>
+            <input id="admin-pass-input" type="password" placeholder="Admin-passord"/>
+            <button id="btn-admin-login" class="btn-orange">Logg inn</button>
+          </div>
+        </div>
+        <div id="admin-area" class="hidden">
+          <div class="alert-green">✅ Innlogget — legg inn faktiske resultater for automatisk poengberegning.</div>
+          <div id="admin-round-pills" class="round-pills" style="margin-top:16px"></div>
+          <div id="admin-sections" style="margin-top:16px"></div>
+          <button id="btn-save-results" class="btn-orange" style="margin-top:24px">💾 Lagre fasit</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
