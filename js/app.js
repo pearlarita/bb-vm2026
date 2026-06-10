@@ -90,11 +90,15 @@ function submitName() {
   const n = document.getElementById("name-input").value.trim();
   if (!n) return;
   state.name = n;
-  if (state.entries[n]) state.bracket = JSON.parse(JSON.stringify(state.entries[n]));
-  // Ensure groups key exists for older saved brackets
-  if (!state.bracket.groups) {
-    state.bracket.groups = {};
-    Object.keys(GROUPS).forEach(g => { state.bracket.groups[g] = [null,null,null,null]; });
+  if (state.entries[n]) {
+    const saved = JSON.parse(JSON.stringify(state.entries[n]));
+    const empty = emptyBracket();
+    // Merge saved into empty so all keys always exist
+    state.bracket = Object.assign(empty, saved);
+    // Ensure groups has all 12 groups
+    Object.keys(GROUPS).forEach(g => {
+      if (!state.bracket.groups[g]) state.bracket.groups[g] = [null,null,null,null];
+    });
   }
 
   document.getElementById("name-gate").classList.add("hidden");
@@ -114,12 +118,12 @@ async function saveBracket() {
   try {
     await api.saveEntry(state.name, state.bracket);
     state.entries[state.name] = JSON.parse(JSON.stringify(state.bracket));
-    btn.textContent = "✅ Lagret!";
+    btn.textContent = "✅ Sendt inn!";
     btn.classList.add("saved");
-    setTimeout(() => { btn.textContent = "💾 Lagre"; btn.classList.remove("saved"); btn.disabled = false; }, 2500);
+    setTimeout(() => { btn.textContent = "📮 Send inn"; btn.classList.remove("saved"); btn.disabled = false; }, 2500);
   } catch (e) {
     showToast("❌ Lagring feilet — sjekk API-tilkobling");
-    btn.textContent = "💾 Lagre"; btn.disabled = false;
+    btn.textContent = "📮 Send inn"; btn.disabled = false;
   }
 }
 
@@ -433,7 +437,7 @@ function makeRoundSection(title, dateRange, pts, matches, values, readOnly, isGo
     const pool = getPoolFn ? getPoolFn(i) : Object.keys(FLAGS);
     grid.appendChild(makeMatchCard(
       `${title} ${matches.length > 1 ? i+1 : ""}`,
-      m, values[i]||"", readOnly, isGold, pts,
+      m, (values&&values[i])||"", readOnly, isGold, pts,
       v => onChangeFn(i,v), pool
     ));
   });
