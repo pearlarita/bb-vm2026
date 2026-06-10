@@ -140,10 +140,10 @@ const R32 = [
   {id:9,  date:"2. jul", time:"02:00",label:"Vinner D – best 3.plass BEFIJ", venue:"San Francisco",ch:"TV 2", gA:{g:"D",r:1}, gB:null, best3Groups:["B","E","F","I","J"]},
   {id:10, date:"2. jul", time:"21:00",label:"Vinner H – 2.pl J",       venue:"Los Angeles",  ch:"TV 2", gA:{g:"H",r:1}, gB:{g:"J",r:2}},
   {id:11, date:"3. jul", time:"01:00",label:"2.pl K – 2.pl L",         venue:"Toronto",      ch:"TV 2", gA:{g:"K",r:2}, gB:{g:"L",r:2}},
-  {id:12, date:"3. jul", time:"05:00",label:"Vinner B – best 3.plass", venue:"Vancouver",    ch:"TV 2", gA:{g:"B",r:1}, gB:null, best3Groups:["E","F","G","I","J"]},
+  {id:12, date:"3. jul", time:"05:00",label:"Vinner B – best 3.plass EFGIJ", venue:"Vancouver",    ch:"TV 2", gA:{g:"B",r:1}, gB:null, best3Groups:["E","F","G","I","J"]},
   {id:13, date:"3. jul", time:"20:00",label:"2.pl D – 2.pl G",         venue:"San Francisco",ch:"TV 2", gA:{g:"D",r:2}, gB:{g:"G",r:2}},
   {id:14, date:"4. jul", time:"00:00",label:"Vinner J – 2.pl H",       venue:"Miami",        ch:"TV 2", gA:{g:"J",r:1}, gB:{g:"H",r:2}},
-  {id:15, date:"4. jul", time:"03:30",label:"Vinner K – best 3.plass", venue:"Kansas City",  ch:"TV 2", gA:{g:"K",r:1}, gB:null, best3Groups:["D","E","I","J","L"]},
+  {id:15, date:"4. jul", time:"03:30",label:"Vinner K – best 3.plass DEIJL", venue:"Kansas City",  ch:"TV 2", gA:{g:"K",r:1}, gB:null, best3Groups:["D","E","I","J","L"]},
 ];
 
 const R16 = [
