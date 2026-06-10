@@ -28,14 +28,14 @@ const GROUPS = {
   B:["Canada","Bosnia-Hercegovina","Qatar","Sveits"],
   C:["Brasil","Marokko","Haiti","Skottland"],
   D:["Australia","Tyrkia","USA","Paraguay"],
-  E:["Tyskland","Curaçao","Nederland","Japan"],
-  F:["Elfenbenskysten","Ecuador","Sverige","Tunisia"],
-  G:["Spania","Kapp Verde","Belgia","Egypt"],
-  H:["Saudi Arabia","Uruguay","Iran","New Zealand"],
+  E:["Tyskland","Curaçao","Elfenbenskysten","Ecuador"],
+  F:["Nederland","Japan","Sverige","Tunisia"],
+  G:["Iran","New Zealand","Belgia","Egypt"],
+  H:["Spania","Kapp Verde","Saudi Arabia","Uruguay",],
   I:["Frankrike","Senegal","Irak","Norge"],
   J:["Argentina","Algerie","Østerrike","Jordan"],
-  K:["Portugal","DR Kongo","England","Kroatia"],
-  L:["Ghana","Panama","Usbekistan","Colombia"],
+  K:["Portugal","DR Kongo","Usbekistan","Colombia"],
+  L:["Ghana","Panama","England","Kroatia"],
 };
 
 // ── GROUP RANKING HELPERS ─────────────────────────────────────────────────────
