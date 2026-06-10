@@ -1,5 +1,5 @@
 // ── API — kommuniserer med Google Apps Script ─────────────────────────────────
-const API_URL = "https://script.google.com/macros/s/AKfycbyHSolWo2JOQqdW9Y8WPJnd-vqNQFrBSm-EM9754zzvpVkt6x_xj1AYuDrzmOJgXvRSTA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzBkQSTDvbQpcotiVTkEI0Sf4skId1DxFX0gwBv-eO1KTMcYxLzJN3u7IePijCwuPHLwA/exec";
 
 const api = {
   // GET-kall for lesing
