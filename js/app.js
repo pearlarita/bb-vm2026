@@ -76,7 +76,7 @@ function setupTabs() {
         }).catch(() => renderRanking());
       }
       if (btn.dataset.tab === "fasit") {
-        renderFasit();
+        renderFasit(); // renderFasit fetches fresh data internally
       }
     });
   });
@@ -714,7 +714,17 @@ function renderSchedule(roundId) {
   const byDate = {};
   matches.forEach(m => { if(!byDate[m.date]) byDate[m.date]=[]; byDate[m.date].push(m); });
 
-  Object.entries(byDate).forEach(([date, ms]) => {
+  // Sort dates chronologically (parse "11. jun" style dates)
+  const monthOrder = {"jan":1,"feb":2,"mar":3,"apr":4,"mai":5,"jun":6,
+                      "jul":7,"aug":8,"sep":9,"okt":10,"nov":11,"des":12};
+  const parseSortKey = d => {
+    const [day, mon] = d.split(". ");
+    return (monthOrder[mon]||0) * 100 + parseInt(day);
+  };
+  const sortedDates = Object.keys(byDate).sort((a,b) => parseSortKey(a) - parseSortKey(b));
+
+  sortedDates.forEach(date => {
+    const ms = byDate[date];
     const group = document.createElement("div");
     group.className = "sched-group";
     group.innerHTML = `<div class="sched-date-header">${date}</div>`;
@@ -771,18 +781,31 @@ function renderSchedule(roundId) {
 function renderFasit() {
   const container = document.getElementById("fasit-sections");
   if (!container) return;
-  const hasResults = state.results && (
-    (state.results.r32 && state.results.r32.some(Boolean)) ||
-    (state.results.sf && state.results.sf.some(Boolean)) ||
-    state.results.f
-  );
-  if (!hasResults) {
-    container.innerHTML = `<div class="deadline-msg" style="color:var(--text-soft);border-color:var(--border);background:var(--bg-card)">
-      Ingen fasit er lagt inn ennå. Kom tilbake når kampene er spilt! ⏳
-    </div>`;
-    return;
-  }
-  renderBracketTo("fasit-sections", state.results, true, state.fasitRound, () => {});
+  container.innerHTML = `<div class="deadline-msg" style="color:var(--text-soft);border-color:var(--border);background:var(--bg-card)">Laster resultater...</div>`;
+  // Always fetch fresh from backend
+  api.getResults().then(res => {
+    if (res.ok && res.results) {
+      state.results = res.results;
+    }
+    const r = state.results;
+    const hasResults = r && (
+      (r.groups && Object.values(r.groups).some(g => g && g.some(Boolean))) ||
+      (r.r32 && r.r32.some(Boolean)) ||
+      (r.r16 && r.r16.some(Boolean)) ||
+      (r.qf  && r.qf.some(Boolean)) ||
+      (r.sf  && r.sf.some(Boolean)) ||
+      r.bronze || r.f
+    );
+    if (!hasResults) {
+      container.innerHTML = `<div class="deadline-msg" style="color:var(--text-soft);border-color:var(--border);background:var(--bg-card)">
+        Ingen resultater er lagt inn ennå. Kom tilbake når kampene er spilt! ⏳
+      </div>`;
+      return;
+    }
+    renderBracketTo("fasit-sections", state.results, true, state.fasitRound, () => {});
+  }).catch(() => {
+    container.innerHTML = `<div class="deadline-msg">Kunne ikke laste resultater — prøv igjen.</div>`;
+  });
 }
 
 // ── RANKING ───────────────────────────────────────────────────────────────────
