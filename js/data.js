@@ -63,6 +63,7 @@ const GROUP_MATCHES = [
   {date:"24. jun",time:"21:00",home:"Bosnia-Hercegovina",away:"Qatar",ch:"NRK",venue:"Seattle",g:"B"},
   // Gruppe C
   {date:"14. jun",time:"00:00",home:"Brasil",away:"Spania",ch:"TV 2",venue:"New York",g:"C"},
+  {date:"14. jun",time:"03:00",home:"Japan",away:"Kapp Verde",ch:"TV 2",venue:"Dallas",g:"C"},
   {date:"15. jun",time:"18:00",home:"Spania",away:"Kapp Verde",ch:"TV 2",venue:"Atlanta",g:"C"},
   {date:"20. jun",time:"00:00",home:"Kapp Verde",away:"Brasil",ch:"NRK",venue:"Boston",g:"C"},
   {date:"20. jun",time:"03:00",home:"Japan",away:"Spania",ch:"NRK",venue:"Philadelphia",g:"C"},
@@ -84,6 +85,7 @@ const GROUP_MATCHES = [
   {date:"25. jun",time:"22:00",home:"Saudi Arabia",away:"Tyskland",ch:"NRK",venue:"Dallas",g:"E"},
   // Gruppe F
   {date:"14. jun",time:"03:00",home:"Haiti",away:"England",ch:"TV 2",venue:"Boston",g:"F"},
+  {date:"14. jun",time:"22:00",home:"Nederland",away:"Tunisia",ch:"NRK",venue:"Miami",g:"H"},
   {date:"15. jun",time:"04:00",home:"Panama",away:"Kamerun",ch:"TV 2",venue:"Monterrey",g:"F"},
   {date:"20. jun",time:"22:00",home:"England",away:"Kamerun",ch:"TV 2",venue:"Toronto",g:"F"},
   {date:"21. jun",time:"06:00",home:"Haiti",away:"Panama",ch:"NRK",venue:"Monterrey",g:"F"},
@@ -220,9 +222,25 @@ function getPool(round, idx, bracket) {
   if (round === "r16") { const m = R16[idx]; return [bracket.r32[m.from[0]], bracket.r32[m.from[1]]].filter(Boolean); }
   if (round === "qf")  { const m = QF[idx];  return [bracket.r16[m.from[0]], bracket.r16[m.from[1]]].filter(Boolean); }
   if (round === "sf")  { const m = SF[idx];  return [bracket.qf[m.from[0]], bracket.qf[m.from[1]]].filter(Boolean); }
-  // Bronze: losers of SF — same pool as SF winners since we don't track losers separately
-  // The user picks which SF loser wins bronze from the SF participants
-  if (round === "bronze") return [...bracket.sf].filter(Boolean);
+  // Bronze: the losers of the two semi-finals
+  // SF[0]: winner from qf[0] vs qf[1] — loser is whichever of those two was NOT picked
+  // SF[1]: winner from qf[2] vs qf[3] — loser is whichever of those two was NOT picked
+  if (round === "bronze") {
+    const losers = [];
+    SF.forEach((m, i) => {
+      const sfWinner = bracket.sf[i];
+      const candidate0 = bracket.qf[m.from[0]];
+      const candidate1 = bracket.qf[m.from[1]];
+      if (sfWinner && candidate0 && candidate0 !== sfWinner) losers.push(candidate0);
+      if (sfWinner && candidate1 && candidate1 !== sfWinner) losers.push(candidate1);
+      // If SF winner not set yet, include both QF winners as options
+      if (!sfWinner) {
+        if (candidate0) losers.push(candidate0);
+        if (candidate1) losers.push(candidate1);
+      }
+    });
+    return [...new Set(losers)];
+  }
   // Final: winners of SF
   if (round === "f")      return [...bracket.sf].filter(Boolean);
   if (round === "winner") return [bracket.f].filter(Boolean);
