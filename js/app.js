@@ -20,6 +20,7 @@ let state = {
   schedRound: "group",
   adminMode: false,
   adminRound: "all",
+  fasitRound: "all",
 };
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupAdminGate();
   renderRoundPills("round-pills", r => { state.activeRound = r; renderBracket(); });
   renderRoundPills("admin-round-pills", r => { state.adminRound = r; renderAdminBracket(); }, ADMIN_ROUND_OPTS);
+  renderRoundPills("fasit-round-pills", r => { state.fasitRound = r; renderFasit(); });
   renderSchedPills();
   renderSchedule("all");
 
@@ -52,8 +54,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (e) {
     showToast("⚠️ Kunne ikke koble til backend — sjekk API_URL i js/api.js");
   }
-  // Render ranking immediately so it's visible without login
+  // Render ranking and fasit immediately
   renderRanking();
+  renderFasit();
 });
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
@@ -67,11 +70,13 @@ function setupTabs() {
       // Sidebar only visible in tip tab when logged in
       updateSidebarVisibility();
       if (btn.dataset.tab === "ranking") {
-        // Refresh entries from backend before rendering
         api.getEntries().then(res => {
           if (res.ok) state.entries = res.entries || {};
           renderRanking();
         }).catch(() => renderRanking());
+      }
+      if (btn.dataset.tab === "fasit") {
+        renderFasit();
       }
     });
   });
@@ -110,18 +115,35 @@ function submitName() {
   const n = document.getElementById("name-input").value.trim();
   if (!n) return;
   state.name = n;
-  // Check deadline
+  // Check deadline — show bracket read-only
   if (!isTippingOpen()) {
     document.getElementById("name-gate").classList.add("hidden");
     document.getElementById("bracket-area").classList.remove("hidden");
-    document.getElementById("bracket-title").textContent = "Tipping er stengt 🔒";
+    document.getElementById("bracket-title").textContent = `Din vinneroppstilling, ${n} 🔒`;
     document.getElementById("user-name-display").textContent = n;
     document.getElementById("user-pill").classList.remove("hidden");
-    document.getElementById("bracket-sections").innerHTML =
-      `<div class="deadline-msg">${deadlineText()}</div>`;
-    document.getElementById("round-pills").style.display = "none";
     document.getElementById("btn-save").style.display = "none";
+    document.getElementById("round-pills").style.display = "flex";
     updateSidebarVisibility();
+    // Load saved bracket if exists, then render read-only
+    if (state.entries[n]) {
+      const saved = JSON.parse(JSON.stringify(state.entries[n]));
+      const empty = emptyBracket();
+      state.bracket = {
+        ...empty, ...saved,
+        groups: Object.keys(GROUPS).reduce((acc, g) => {
+          acc[g] = (saved.groups && saved.groups[g]) ? saved.groups[g] : [null,null,null,null];
+          return acc;
+        }, {}),
+      };
+    }
+    // Render read-only
+    renderBracketTo("bracket-sections", state.bracket, true, state.activeRound, () => {});
+    // Show deadline notice
+    const notice = document.createElement("div");
+    notice.className = "deadline-msg";
+    notice.textContent = deadlineText();
+    document.getElementById("bracket-sections").prepend(notice);
     return;
   }
   if (state.entries[n]) {
@@ -455,20 +477,29 @@ function renderBracketTo(containerId, bracket, readOnly, activeRound, onChange, 
     ));
   }
   if (show("bronze")) {
-    // Bronze pool = SF losers (QF winners that were NOT chosen as SF winners)
+    // Bronze pool = SF losers
+    // SF[0] is between qf[0] and qf[1] — loser = whichever was NOT picked as sf[0]
+    // SF[1] is between qf[2] and qf[3] — loser = whichever was NOT picked as sf[1]
     const bronzePool = [];
     SF.forEach((m, i) => {
-      const sfWinner = bracket.sf[i];
-      const c0 = bracket.qf[m.from[0]];
-      const c1 = bracket.qf[m.from[1]];
-      if (sfWinner && c0 && c0 !== sfWinner) bronzePool.push(c0);
-      if (sfWinner && c1 && c1 !== sfWinner) bronzePool.push(c1);
-      if (!sfWinner) { if (c0) bronzePool.push(c0); if (c1) bronzePool.push(c1); }
+      const sfWinner = bracket.sf[i];          // e.g. bracket.sf[0] = "Brasil"
+      const c0 = bracket.qf[m.from[0]];        // e.g. bracket.qf[0]
+      const c1 = bracket.qf[m.from[1]];        // e.g. bracket.qf[1]
+      if (sfWinner) {
+        // Push the one that is NOT the SF winner
+        if (c0 && c0 !== sfWinner) bronzePool.push(c0);
+        if (c1 && c1 !== sfWinner) bronzePool.push(c1);
+      } else {
+        // SF winner not set yet — show both QF winners
+        if (c0) bronzePool.push(c0);
+        if (c1) bronzePool.push(c1);
+      }
     });
+    const uniqueBronzePool = [...new Set(bronzePool)];
     container.appendChild(makeSingleMatchSection("Bronsefinale","18. jul",20,false,
       BRONZE_MATCH, bracket.bronze, readOnly,
       v => onChange("bronze",0,v),
-      [...new Set(bronzePool)]
+      uniqueBronzePool
     ));
   }
   if (show("f")) {
@@ -743,6 +774,24 @@ function renderSchedule(roundId) {
     });
     container.appendChild(group);
   });
+}
+
+// ── FASIT ─────────────────────────────────────────────────────────────────────
+function renderFasit() {
+  const container = document.getElementById("fasit-sections");
+  if (!container) return;
+  const hasResults = state.results && (
+    (state.results.r32 && state.results.r32.some(Boolean)) ||
+    (state.results.sf && state.results.sf.some(Boolean)) ||
+    state.results.f
+  );
+  if (!hasResults) {
+    container.innerHTML = `<div class="deadline-msg" style="color:var(--text-soft);border-color:var(--border);background:var(--bg-card)">
+      Ingen fasit er lagt inn ennå. Kom tilbake når kampene er spilt! ⏳
+    </div>`;
+    return;
+  }
+  renderBracketTo("fasit-sections", state.results, true, state.fasitRound, () => {});
 }
 
 // ── RANKING ───────────────────────────────────────────────────────────────────
