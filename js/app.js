@@ -727,18 +727,9 @@ function renderSchedule(roundId) {
            ${m.roundLabel?`<span class="badge-group">${m.roundLabel}</span>`:""}`
         : `<span style="color:var(--text-mid);font-size:13px">${m.label||""}</span>
            ${m.roundLabel?`<span class="badge-group" style="margin-left:4px">${m.roundLabel}</span>`:""}`;
-      // Check if this group match has a result
+      // Only show winner for knockout matches (not group matches — no per-match result tracked)
       let winnerHtml = "";
-      if (m.home && state.results && state.results.groups) {
-        // Find which group this match belongs to, check if both teams ranked
-        const g = m.g;
-        const ranked = state.results.groups && state.results.groups[g];
-        if (ranked && ranked[0]) {
-          winnerHtml = `<div class="sched-winner">${flagHtml(ranked[0])} ${ranked[0]}</div>`;
-        }
-      }
-      // For knockout matches check r32/r16/qf/sf/bronze/f results
-      if (!m.home && !winnerHtml && state.results) {
+      if (!m.home && state.results) {
         const roundMap = {
           "16-delsfinale": {key:"r32", matches:R32},
           "8-delsfinale":  {key:"r16", matches:R16},
