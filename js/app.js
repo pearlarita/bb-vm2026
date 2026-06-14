@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupAdminGate();
   renderRoundPills("round-pills", r => { state.activeRound = r; renderBracket(); });
   renderRoundPills("admin-round-pills", r => { state.adminRound = r; renderAdminBracket(); }, ADMIN_ROUND_OPTS);
-  renderRoundPills("fasit-round-pills", r => { state.fasitRound = r; renderFasit(); });
+  renderRoundPills("fasit-round-pills", r => { state.fasitRound = r; renderFasit(); }, ADMIN_ROUND_OPTS);
   renderSchedPills();
   renderSchedule("all");
 
@@ -724,7 +724,12 @@ function renderSchedule(roundId) {
   const sortedDates = Object.keys(byDate).sort((a,b) => parseSortKey(a) - parseSortKey(b));
 
   sortedDates.forEach(date => {
-    const ms = byDate[date];
+    // Sort matches within each date by time
+    const ms = byDate[date].sort((a, b) => {
+      const [ah, am] = a.time.split(":").map(Number);
+      const [bh, bm] = b.time.split(":").map(Number);
+      return (ah * 60 + am) - (bh * 60 + bm);
+    });
     const group = document.createElement("div");
     group.className = "sched-group";
     group.innerHTML = `<div class="sched-date-header">${date}</div>`;
@@ -802,7 +807,7 @@ function renderFasit() {
       </div>`;
       return;
     }
-    renderBracketTo("fasit-sections", state.results, true, state.fasitRound, () => {});
+    renderBracketTo("fasit-sections", state.results, true, state.fasitRound, () => {}, true);
   }).catch(() => {
     container.innerHTML = `<div class="deadline-msg">Kunne ikke laste resultater — prøv igjen.</div>`;
   });
