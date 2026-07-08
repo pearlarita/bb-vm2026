@@ -20,6 +20,7 @@ let state = {
   schedRound: "group",
   adminMode: false,
   adminRound: "all",
+  resultsUpdatedAt: null,
   fasitRound: "all",
 };
 
@@ -737,7 +738,7 @@ function renderSchedule(roundId) {
       const chClass = m.ch==="NRK"?"nrk":m.ch==="TV 2"?"tv2":"";
       const teamsHtml = m.home
         ? `${flagHtml(m.home)} ${m.home} <span class="sched-vs">vs</span> ${flagHtml(m.away)} ${m.away}
-           ${m.norway?`<span class="badge-norway">🇳🇴 Norge</span>`:""}
+
            ${m.g?`<span class="badge-group">Gruppe ${m.g}</span>`:""}
            ${m.roundLabel?`<span class="badge-group">${m.roundLabel}</span>`:""}`
         : `<span style="color:var(--text-mid);font-size:13px">${m.label||""}</span>
@@ -791,6 +792,7 @@ function renderFasit() {
   api.getResults().then(res => {
     if (res.ok && res.results) {
       state.results = res.results;
+      state.resultsUpdatedAt = res.updatedAt || null;
     }
     const r = state.results;
     const hasResults = r && (
@@ -806,6 +808,20 @@ function renderFasit() {
         Ingen resultater er lagt inn ennå. Kom tilbake når kampene er spilt! ⏳
       </div>`;
       return;
+    }
+    // Show last updated timestamp
+    const updatedAt = state.resultsUpdatedAt;
+    if (updatedAt) {
+      const d = new Date(updatedAt);
+      const norsk = d.toLocaleString("nb-NO", {
+        timeZone: "Europe/Oslo",
+        day: "numeric", month: "long", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+      });
+      const box = document.createElement("div");
+      box.className = "results-updated-box";
+      box.innerHTML = `🕒 Sist oppdatert: <strong>${norsk}</strong>`;
+      container.appendChild(box);
     }
     renderBracketTo("fasit-sections", state.results, true, state.fasitRound, () => {}, true);
   }).catch(() => {
