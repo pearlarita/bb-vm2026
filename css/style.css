@@ -1020,3 +1020,15 @@ input:focus { border-color: var(--green1); }
   font-weight: 500;
   margin-top: 8px;
 }
+
+/* ── RESULTS UPDATED BOX ─────────────────────────────────────────────────── */
+.results-updated-box {
+  background: var(--bg-deep);
+  border: 1.5px solid var(--border-md);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--text-mid);
+  margin-bottom: 20px;
+  display: inline-block;
+}
