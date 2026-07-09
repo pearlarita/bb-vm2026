@@ -145,35 +145,34 @@ const GROUP_MATCHES = [
 // rank 1 = group winner, rank 2 = runner-up
 // "best3" entries are open to any 3rd-place (rank 3 from various groups)
 // best3Groups: which groups' 3rd-place teams are eligible for this slot (per NRK bracket)
-// R32 fra tipsbladet (sluttspilltre) — faktiske kamppar
 const R32 = [
-  {id:0,  date:"28. jun",time:"21:00",label:"Sør-Afrika – Canada",       venue:"Los Angeles",   ch:"TV 2", gA:{g:"A",r:2}, gB:{g:"B",r:2}},
-  {id:1,  date:"29. jun",time:"19:00",label:"Brasil – Japan",             venue:"Houston",       ch:"NRK",  gA:{g:"C",r:1}, gB:{g:"F",r:2}},
-  {id:2,  date:"29. jun",time:"22:30",label:"Tyskland – Paraguay",        venue:"Boston",        ch:"TV 2", gA:{g:"E",r:1}, gB:null, best3Groups:["A","B","C","D","F"]},
-  {id:3,  date:"30. jun",time:"03:00",label:"Nederland – Marokko",        venue:"Monterrey",     ch:"TV 2", gA:{g:"F",r:1}, gB:{g:"C",r:2}},
-  {id:4,  date:"30. jun",time:"19:00",label:"Elfenbenskysten – Norge",    venue:"Dallas",        ch:"NRK",  gA:{g:"E",r:2}, gB:{g:"I",r:2}},
-  {id:5,  date:"30. jun",time:"23:00",label:"Frankrike – Sverige",        venue:"New York",      ch:"NRK",  gA:{g:"I",r:1}, gB:null, best3Groups:["C","D","F","G","H"]},
-  {id:6,  date:"1. jul", time:"03:00",label:"Mexico – Ecuador",           venue:"Mexico City",   ch:"TV 2", gA:{g:"A",r:1}, gB:null, best3Groups:["C","E","F","H","I"]},
-  {id:7,  date:"1. jul", time:"18:00",label:"England – DR Kongo",         venue:"Atlanta",       ch:"NRK",  gA:{g:"L",r:1}, gB:null, best3Groups:["E","H","I","J","K"]},
-  {id:8,  date:"1. jul", time:"22:00",label:"Belgia – Senegal",           venue:"Seattle",       ch:"NRK",  gA:{g:"G",r:1}, gB:null, best3Groups:["A","E","H","I","J"]},
-  {id:9,  date:"2. jul", time:"02:00",label:"USA – Bosnia-Hercegovina",   venue:"San Francisco", ch:"TV 2", gA:{g:"D",r:1}, gB:null, best3Groups:["B","E","F","I","J"]},
-  {id:10, date:"2. jul", time:"21:00",label:"Spania – Østerrike",         venue:"Los Angeles",   ch:"NRK",  gA:{g:"H",r:1}, gB:{g:"J",r:2}},
-  {id:11, date:"3. jul", time:"01:00",label:"Portugal – Kroatia",         venue:"Toronto",       ch:"NRK",  gA:{g:"K",r:2}, gB:{g:"L",r:2}},
-  {id:12, date:"3. jul", time:"05:00",label:"Sveits – Algerie",           venue:"Vancouver",     ch:"TV 2", gA:{g:"B",r:1}, gB:null, best3Groups:["E","F","G","I","J"]},
-  {id:13, date:"3. jul", time:"20:00",label:"Australia – Egypt",          venue:"Dallas",        ch:"TV 2", gA:{g:"D",r:2}, gB:{g:"G",r:2}},
-  {id:14, date:"4. jul", time:"00:00",label:"Argentina – Kapp Verde",     venue:"Miami",         ch:"TV 2", gA:{g:"J",r:1}, gB:{g:"H",r:2}},
-  {id:15, date:"4. jul", time:"03:30",label:"Colombia – Ghana",           venue:"Kansas City",   ch:"NRK",  gA:{g:"K",r:1}, gB:null, best3Groups:["D","E","I","J","L"]},
+  {id:0,  date:"28. jun",time:"21:00",label:"2.pl A – 2.pl B",                    venue:"Los Angeles",  ch:"TV 2", gA:{g:"A",r:2}, gB:{g:"B",r:2}},
+  {id:1,  date:"29. jun",time:"19:00",label:"Vinner C – 2.pl F",                  venue:"Houston",      ch:"TV 2", gA:{g:"C",r:1}, gB:{g:"F",r:2}},
+  {id:2,  date:"29. jun",time:"22:30",label:"Vinner E – beste 3.plass (A/B/C/D/F)",venue:"Boston",       ch:"TV 2", gA:{g:"E",r:1}, gB:null, best3Groups:["A","B","C","D","F"]},
+  {id:3,  date:"30. jun",time:"03:00",label:"Vinner F – 2.pl C",                  venue:"Monterrey",    ch:"TV 2", gA:{g:"F",r:1}, gB:{g:"C",r:2}},
+  {id:4,  date:"30. jun",time:"19:00",label:"2.pl E – 2.pl I",                    venue:"Dallas",       ch:"TV 2", gA:{g:"E",r:2}, gB:{g:"I",r:2}},
+  {id:5,  date:"30. jun",time:"23:00",label:"Vinner I – beste 3.plass (C/D/F/G/H)",venue:"New York",     ch:"TV 2", gA:{g:"I",r:1}, gB:null, best3Groups:["C","D","F","G","H"]},
+  {id:6,  date:"1. jul", time:"03:00",label:"Vinner A – beste 3.plass (C/E/F/H/I)",venue:"Mexico City",  ch:"TV 2", gA:{g:"A",r:1}, gB:null, best3Groups:["C","E","F","H","I"]},
+  {id:7,  date:"1. jul", time:"18:00",label:"Vinner L – beste 3.plass (E/H/I/J/K)",venue:"Atlanta",      ch:"TV 2", gA:{g:"L",r:1}, gB:null, best3Groups:["E","H","I","J","K"]},
+  {id:8,  date:"1. jul", time:"22:00",label:"Vinner G – beste 3.plass (A/E/H/I/J)",venue:"Seattle",      ch:"TV 2", gA:{g:"G",r:1}, gB:null, best3Groups:["A","E","H","I","J"]},
+  {id:9,  date:"2. jul", time:"02:00",label:"Vinner D – beste 3.plass (B/E/F/I/J)",venue:"San Francisco",ch:"TV 2", gA:{g:"D",r:1}, gB:null, best3Groups:["B","E","F","I","J"]},
+  {id:10, date:"2. jul", time:"21:00",label:"Vinner H – 2.pl J",                  venue:"Los Angeles",  ch:"TV 2", gA:{g:"H",r:1}, gB:{g:"J",r:2}},
+  {id:11, date:"3. jul", time:"01:00",label:"2.pl K – 2.pl L",                    venue:"Toronto",      ch:"TV 2", gA:{g:"K",r:2}, gB:{g:"L",r:2}},
+  {id:12, date:"3. jul", time:"05:00",label:"Vinner B – beste 3.plass (E/F/G/I/J)",venue:"Vancouver",    ch:"TV 2", gA:{g:"B",r:1}, gB:null, best3Groups:["E","F","G","I","J"]},
+  {id:13, date:"3. jul", time:"20:00",label:"2.pl D – 2.pl G",                    venue:"Dallas",       ch:"TV 2", gA:{g:"D",r:2}, gB:{g:"G",r:2}},
+  {id:14, date:"4. jul", time:"00:00",label:"Vinner J – 2.pl H",                  venue:"Miami",        ch:"TV 2", gA:{g:"J",r:1}, gB:{g:"H",r:2}},
+  {id:15, date:"4. jul", time:"03:30",label:"Vinner K – beste 3.plass (D/E/I/J/L)",venue:"Kansas City",  ch:"TV 2", gA:{g:"K",r:1}, gB:null, best3Groups:["D","E","I","J","L"]},
 ];
 
 const R16 = [
-  {id:0, date:"4. jul", time:"19:00",label:"Canada – Marokko",         venue:"Houston",       ch:"NRK",from:[0,3]},
-  {id:1, date:"4. jul", time:"23:00",label:"Paraguay – Frankrike",     venue:"Philadelphia",  ch:"NRK",from:[2,5]},
-  {id:2, date:"5. jul", time:"22:00",label:"Brasil – Norge",           venue:"New York",      ch:"NRK",from:[1,4]},
-  {id:3, date:"6. jul", time:"02:00",label:"Mexico – England",         venue:"Mexico City",   ch:"NRK",from:[6,7]},
-  {id:4, date:"6. jul", time:"21:00",label:"Portugal – Spania",        venue:"Dallas",        ch:"NRK",from:[11,10]},
-  {id:5, date:"7. jul", time:"02:00",label:"USA – Belgia",             venue:"Seattle",       ch:"NRK",from:[9,8]},
-  {id:6, date:"7. jul", time:"18:00",label:"Argentina – Egypt",        venue:"Atlanta",       ch:"NRK",from:[14,13]},
-  {id:7, date:"7. jul", time:"22:00",label:"Sveits – Colombia",        venue:"Vancouver",     ch:"NRK",from:[12,15]},
+  {id:0, date:"4. jul", time:"19:00",label:"V16-1 – V16-3",   venue:"Houston",      ch:"NRK",from:[0,2]},
+  {id:1, date:"4. jul", time:"23:00",label:"V16-2 – V16-5",   venue:"Philadelphia", ch:"NRK",from:[1,4]},
+  {id:2, date:"5. jul", time:"22:00",label:"V16-4 – V16-6",   venue:"New York",     ch:"NRK",from:[3,5]},
+  {id:3, date:"6. jul", time:"02:00",label:"V16-7 – V16-8",   venue:"Mexico City",  ch:"NRK",from:[6,7]},
+  {id:4, date:"6. jul", time:"21:00",label:"V16-11 – V16-12", venue:"Dallas",       ch:"NRK",from:[10,11]},
+  {id:5, date:"7. jul", time:"02:00",label:"V16-9 – V16-10",  venue:"Seattle",      ch:"NRK",from:[8,9]},
+  {id:6, date:"7. jul", time:"18:00",label:"V16-14 – V16-16", venue:"Atlanta",      ch:"NRK",from:[13,15]},
+  {id:7, date:"7. jul", time:"22:00",label:"V16-13 – V16-15", venue:"Vancouver",    ch:"NRK",from:[12,14]},
 ];
 
 const QF = [
