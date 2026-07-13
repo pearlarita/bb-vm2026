@@ -20,7 +20,6 @@ let state = {
   schedRound: "group",
   adminMode: false,
   adminRound: "all",
-  resultsUpdatedAt: null,
   fasitRound: "all",
 };
 
@@ -449,68 +448,62 @@ function renderBracketTo(containerId, bracket, readOnly, activeRound, onChange, 
     container.appendChild(makeGroupRankingSection(bracket, readOnly, onChange));
   }
 
-  // Admin/fasit: no pool restriction — allow all teams
-  const allTeams = Object.keys(FLAGS);
-  const poolFn = showGroups
-    ? () => allTeams
-    : null;
-
   if (show("r32")) {
     container.appendChild(makeRoundSection("16-delsfinaler", "28. jun – 4. jul", 3,
       R32, bracket.r32, readOnly, false,
       (i,v) => onChange("r32",i,v),
-      showGroups ? poolFn : i => getR32Pool(i, bracket)
+      i => getR32Pool(i, bracket)
     ));
   }
   if (show("r16")) {
     container.appendChild(makeRoundSection("8-delsfinaler", "4. jul – 7. jul", 5,
       R16, bracket.r16, readOnly, false,
       (i,v) => onChange("r16",i,v),
-      showGroups ? poolFn : i => { const m=R16[i]; return [bracket.r32[m.from[0]],bracket.r32[m.from[1]]].filter(Boolean); }
+      i => { const m=R16[i]; return [bracket.r32[m.from[0]],bracket.r32[m.from[1]]].filter(Boolean); }
     ));
   }
   if (show("qf")) {
     container.appendChild(makeRoundSection("Kvartfinaler", "9. jul – 12. jul", 10,
       QF, bracket.qf, readOnly, false,
       (i,v) => onChange("qf",i,v),
-      showGroups ? poolFn : i => { const m=QF[i]; return [bracket.r16[m.from[0]],bracket.r16[m.from[1]]].filter(Boolean); }
+      i => { const m=QF[i]; return [bracket.r16[m.from[0]],bracket.r16[m.from[1]]].filter(Boolean); }
     ));
   }
   if (show("sf")) {
     container.appendChild(makeRoundSection("Semifinaler", "14. – 15. jul", 15,
       SF, bracket.sf, readOnly, false,
       (i,v) => onChange("sf",i,v),
-      showGroups ? poolFn : i => { const m=SF[i]; return [bracket.qf[m.from[0]],bracket.qf[m.from[1]]].filter(Boolean); }
+      i => { const m=SF[i]; return [bracket.qf[m.from[0]],bracket.qf[m.from[1]]].filter(Boolean); }
     ));
   }
   if (show("bronze")) {
-    let bronzePool;
-    if (showGroups) {
-      bronzePool = allTeams;
-    } else {
-      bronzePool = [];
-      SF.forEach((m, i) => {
-        const sfWinner = bracket.sf[i];
-        const c0 = bracket.qf[m.from[0]];
-        const c1 = bracket.qf[m.from[1]];
-        if (sfWinner) {
-          if (c0 && c0 !== sfWinner) bronzePool.push(c0);
-          if (c1 && c1 !== sfWinner) bronzePool.push(c1);
-        } else {
-          if (c0) bronzePool.push(c0);
-          if (c1) bronzePool.push(c1);
-        }
-      });
-      bronzePool = [...new Set(bronzePool)];
-    }
+    // Bronze pool = SF losers
+    // SF[0] is between qf[0] and qf[1] — loser = whichever was NOT picked as sf[0]
+    // SF[1] is between qf[2] and qf[3] — loser = whichever was NOT picked as sf[1]
+    const bronzePool = [];
+    SF.forEach((m, i) => {
+      const sfWinner = bracket.sf[i];          // e.g. bracket.sf[0] = "Brasil"
+      const c0 = bracket.qf[m.from[0]];        // e.g. bracket.qf[0]
+      const c1 = bracket.qf[m.from[1]];        // e.g. bracket.qf[1]
+      if (sfWinner) {
+        // Push the one that is NOT the SF winner
+        if (c0 && c0 !== sfWinner) bronzePool.push(c0);
+        if (c1 && c1 !== sfWinner) bronzePool.push(c1);
+      } else {
+        // SF winner not set yet — show both QF winners
+        if (c0) bronzePool.push(c0);
+        if (c1) bronzePool.push(c1);
+      }
+    });
+    const uniqueBronzePool = [...new Set(bronzePool)];
     container.appendChild(makeSingleMatchSection("Bronsefinale","18. jul",20,false,
       BRONZE_MATCH, bracket.bronze, readOnly,
       v => onChange("bronze",0,v),
-      bronzePool
+      uniqueBronzePool
     ));
   }
   if (show("f")) {
-    container.appendChild(makeFinalSection(bracket, readOnly, onChange, showGroups ? allTeams : null));
+    container.appendChild(makeFinalSection(bracket, readOnly, onChange));
   }
 }
 
@@ -562,7 +555,7 @@ function makeSingleMatchSection(title, dateStr, pts, isGold, matchInfo, value, r
   return section;
 }
 
-function makeFinalSection(bracket, readOnly, onChange, poolOverride) {
+function makeFinalSection(bracket, readOnly, onChange) {
   const section = document.createElement("div");
   section.className = "round-section";
   const header = document.createElement("div");
@@ -744,7 +737,7 @@ function renderSchedule(roundId) {
       const chClass = m.ch==="NRK"?"nrk":m.ch==="TV 2"?"tv2":"";
       const teamsHtml = m.home
         ? `${flagHtml(m.home)} ${m.home} <span class="sched-vs">vs</span> ${flagHtml(m.away)} ${m.away}
-
+           ${m.norway?`<span class="badge-norway">🇳🇴 Norge</span>`:""}
            ${m.g?`<span class="badge-group">Gruppe ${m.g}</span>`:""}
            ${m.roundLabel?`<span class="badge-group">${m.roundLabel}</span>`:""}`
         : `<span style="color:var(--text-mid);font-size:13px">${m.label||""}</span>
@@ -798,7 +791,6 @@ function renderFasit() {
   api.getResults().then(res => {
     if (res.ok && res.results) {
       state.results = res.results;
-      state.resultsUpdatedAt = res.updatedAt || null;
     }
     const r = state.results;
     const hasResults = r && (
@@ -814,20 +806,6 @@ function renderFasit() {
         Ingen resultater er lagt inn ennå. Kom tilbake når kampene er spilt! ⏳
       </div>`;
       return;
-    }
-    // Show last updated timestamp
-    const updatedAt = state.resultsUpdatedAt;
-    if (updatedAt) {
-      const d = new Date(updatedAt);
-      const norsk = d.toLocaleString("nb-NO", {
-        timeZone: "Europe/Oslo",
-        day: "numeric", month: "long", year: "numeric",
-        hour: "2-digit", minute: "2-digit"
-      });
-      const box = document.createElement("div");
-      box.className = "results-updated-box";
-      box.innerHTML = `🕒 Sist oppdatert: <strong>${norsk}</strong>`;
-      container.appendChild(box);
     }
     renderBracketTo("fasit-sections", state.results, true, state.fasitRound, () => {}, true);
   }).catch(() => {
